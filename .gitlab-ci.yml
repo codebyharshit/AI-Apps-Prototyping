@@ -1,0 +1,25 @@
+image: node:18-alpine
+
+pages:
+  stage: deploy
+  cache:
+    paths:
+      - node_modules/
+  before_script:
+    - npm ci --only=production
+  script:
+    - npm run build
+    - cp -r .next/static .next/standalone/.next/
+    - cp -r public .next/standalone/
+    - echo "export default function handler(req, res) { res.redirect('/'); }" > .next/standalone/api/_redirect.js
+  artifacts:
+    paths:
+      - .next/standalone
+    expire_in: 1 hour
+  only:
+    - main
+    - master
+    - fix/react-live-component-errors
+  environment:
+    name: production
+    url: https://$CI_PROJECT_PATH_SLUG.$CI_DEFAULT_BRANCH.pages.$CI_SERVER_HOST

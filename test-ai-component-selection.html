@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Component Selection Test</title>
+    <style>
+        /* AI Component Selection Styles */
+        .ai-component {
+            cursor: pointer;
+            border: 2px solid #3b82f6;
+            padding: 20px;
+            margin: 20px;
+            background: #f8fafc;
+        }
+
+        .ai-component * {
+            pointer-events: none !important;
+            user-select: none !important;
+        }
+
+        .ai-component .ai-live-preview-container {
+            pointer-events: auto !important;
+        }
+
+        .ai-component .ai-live-preview {
+            pointer-events: none !important;
+        }
+
+        /* Ensure AI component container is clickable */
+        .ai-component[data-ai-component="true"] {
+            pointer-events: auto !important;
+            cursor: pointer;
+        }
+
+        .test-form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .test-form input, .test-form textarea, .test-form button {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .test-form button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .test-form button:hover {
+            background: #2563eb;
+        }
+
+        .selection-indicator {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            background: #10b981;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>AI Component Selection Test</h1>
+    <p>This test demonstrates that AI components can only be selected as complete units, not individual internal elements.</p>
+    
+    <div class="ai-component" data-ai-component="true" data-component-id="test-component-1" data-component-type="AIForm">
+        <div class="ai-live-preview-container">
+            <div class="ai-live-preview">
+                <div class="test-form">
+                    <h3>Contact Form</h3>
+                    <input type="text" placeholder="Enter your name" />
+                    <input type="email" placeholder="Enter your email" />
+                    <textarea placeholder="Enter your message"></textarea>
+                    <button type="submit">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ai-component" data-ai-component="true" data-component-id="test-component-2" data-component-type="AICard">
+        <div class="ai-live-preview-container">
+            <div class="ai-live-preview">
+                <div class="test-form">
+                    <h3>Product Card</h3>
+                    <p>This is a product description</p>
+                    <button>Add to Cart</button>
+                    <button>View Details</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="selection-info">
+        <h3>Selection Status:</h3>
+        <p id="selected-component">No component selected</p>
+        <p id="clicked-element">No element clicked</p>
+    </div>
+
+    <script>
+        let selectedComponent = null;
+
+        // Add click handlers to AI components
+        document.querySelectorAll('.ai-component[data-ai-component="true"]').forEach(component => {
+            component.addEventListener('click', (e) => {
+                e.stopPropagation();
+                
+                // Remove previous selection
+                document.querySelectorAll('.selection-indicator').forEach(indicator => {
+                    indicator.remove();
+                });
+                
+                // Add selection indicator
+                const indicator = document.createElement('div');
+                indicator.className = 'selection-indicator';
+                indicator.textContent = 'SELECTED';
+                component.style.position = 'relative';
+                component.appendChild(indicator);
+                
+                // Update selection info
+                selectedComponent = component.dataset.componentId;
+                document.getElementById('selected-component').textContent = `Selected: ${selectedComponent}`;
+                document.getElementById('clicked-element').textContent = `Clicked: AI Component Container`;
+                
+                console.log('🎯 AI Component selected:', selectedComponent);
+            });
+        });
+
+        // Add click handlers to internal elements to show they don't work
+        document.querySelectorAll('.ai-component input, .ai-component textarea, .ai-component button').forEach(element => {
+            element.addEventListener('click', (e) => {
+                e.stopPropagation();
+                console.log('❌ Internal element clicked but selection prevented:', element.tagName);
+                document.getElementById('clicked-element').textContent = `Clicked: ${element.tagName} (selection prevented)`;
+            });
+        });
+
+        // Test form submission (should still work)
+        document.querySelectorAll('.ai-component button[type="submit"]').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                alert('Form submission would work here (functionality preserved)');
+            });
+        });
+    </script>
+</body>
+</html>
